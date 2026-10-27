@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca - Painel</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #f4f6f8;
+            color: #333;
+            padding: 24px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 16px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #1e293b;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #334155;
+        }
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 180px;
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #475569;
+        }
+        input, select, button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        button.secondary {
+            background-color: #64748b;
+        }
+        button.secondary:hover {
+            background-color: #475569;
+        }
+        button.danger {
+            background-color: #dc2626;
+        }
+        button.danger:hover {
+            background-color: #b91c1c;
+        }
+        button.small {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-success {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+        .badge-info {
+            background-color: #e0e7ff;
+            color: #4338ca;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        th, td {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        .alert-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #f87171;
+        }
+        .alert-success {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .quick-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .quick-buttons button {
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div>
+            <h1>Biblioteca Universitária</h1>
+            <p style="font-size: 13px; color: #64748b;">Sistema de Empréstimos e Catálogo</p>
+        </div>
+        <div class="user-status" id="userStatusArea">
+            <span id="userStatusText">Não autenticado</span>
+            <button id="btnLogout" class="secondary small hidden" onclick="fazerLogout()">Sair</button>
+            <a href="/swagger-ui/index.html" target="_blank" style="font-size: 13px; color: #2563eb; text-decoration: none; font-weight: 600;">Swagger Docs</a>
+        </div>
+    </header>
+
+    <div id="alertBox" class="alert"></div>
+
+    <div class="card" id="cardLogin">
+        <h2>Identificação do Usuário</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="inputEmail">E-mail</label>
+                <input type="email" id="inputEmail" placeholder="admin@biblioteca.com" value="admin@biblioteca.com">
+            </div>
+            <div class="form-group">
+                <label for="inputSenha">Senha</label>
+                <input type="password" id="inputSenha" placeholder="admin123" value="admin123">
+            </div>
+            <div class="form-group" style="justify-content: flex-end;">
+                <button type="button" onclick="fazerLogin()">Entrar</button>
+            </div>
+        </div>
+        <div class="quick-buttons">
+            <span style="font-size: 12px; color: #64748b; align-self: center;">Preenchimento rápido:</span>
+            <button type="button" class="secondary" onclick="preencher('admin@biblioteca.com', 'admin123')">Admin</button>
+            <button type="button" class="secondary" onclick="preencher('leitor@biblioteca.com', 'leitor123')">Leitor</button>
+            <button type="button" class="secondary" onclick="preencher('ana.souza@email.com', 'senha123')">Ana (Leitora)</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h2>Catálogo de Livros</h2>
+            <button class="secondary small" onclick="carregarLivros()">Recarregar Livros</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Categoria</th>
+                    <th>Ano</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaLivros">
+                <tr><td colspan="7" style="text-align: center; color: #94a3b8;">Faça login para visualizar os livros</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card hidden" id="cardAdmin">
+        <h2>Cadastrar Novo Livro (Apenas ADMIN)</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="novoTitulo">Título</label>
+                <input type="text" id="novoTitulo" placeholder="Nome do livro">
+            </div>
+            <div class="form-group">
+                <label for="novoIsbn">ISBN</label>
+                <input type="text" id="novoIsbn" placeholder="978-...">
+            </div>
+            <div class="form-group">
+                <label for="novoAno">Ano</label>
+                <input type="number" id="novoAno" placeholder="2024">
+            </div>
+            <div class="form-group">
+                <label for="selectAutor">Autor</label>
+                <select id="selectAutor"></select>
+            </div>
+            <div class="form-group">
+                <label for="selectCategoria">Categoria</label>
+                <select id="selectCategoria"></select>
+            </div>
+            <div class="form-group" style="justify-content: flex-end;">
+                <button type="button" onclick="cadastrarLivro()">Salvar Livro</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Empréstimo Rápido</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="empLivroId">ID do Livro</label>
+                <input type="number" id="empLivroId" placeholder="Ex: 2">
+            </div>
+            <div class="form-group">
+                <label for="empUsuarioId">ID do Usuário</label>
+                <input type="number" id="empUsuarioId" placeholder="Ex: 1">
+            </div>
+            <div class="form-group">
+                <label for="empDataDev">Devolução Prevista</label>
+                <input type="date" id="empDataDev">
+            </div>
+            <div class="form-group" style="justify-content: flex-end;">
+                <button type="button" onclick="realizarEmprestimo()">Registrar Empréstimo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let tokenAtual = localStorage.getItem('biblioteca_jwt_token') || '';
+    let usuarioAtual = JSON.parse(localStorage.getItem('biblioteca_jwt_user') || 'null');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const amanha = new Date();
+        amanha.setDate(amanha.getDate() + 7);
+        document.getElementById('empDataDev').value = amanha.toISOString().split('T')[0];
+
+        if (tokenAtual && usuarioAtual) {
+            atualizarInterfaceUsuario();
+            carregarLivros();
+            carregarAutores();
+            carregarCategorias();
+        }
+    });
+
+    function preencher(email, senha) {
+        document.getElementById('inputEmail').value = email;
+        document.getElementById('inputSenha').value = senha;
+    }
+
+    function exibirAlerta(mensagem, tipo) {
+        const box = document.getElementById('alertBox');
+        box.textContent = mensagem;
+        box.className = 'alert ' + (tipo === 'success' ? 'alert-success' : 'alert-error');
+        box.style.display = 'block';
+        setTimeout(() => {
+            box.style.display = 'none';
+        }, 5000);
+    }
+
+    async function fazerLogin() {
+        const email = document.getElementById('inputEmail').value;
+        const senha = document.getElementById('inputSenha').value;
+
+        try {
+            const resp = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, senha })
+            });
+
+            if (!resp.ok) {
+                const erro = await resp.json().catch(() => ({}));
+                exibirAlerta(erro.mensagem || 'Falha no login. Verifique email e senha.', 'error');
+                return;
+            }
+
+            const dados = await resp.json();
+            tokenAtual = dados.token;
+            usuarioAtual = { nome: dados.nome, email: dados.email, perfil: dados.perfil };
+            localStorage.setItem('biblioteca_jwt_token', tokenAtual);
+            localStorage.setItem('biblioteca_jwt_user', JSON.stringify(usuarioAtual));
+
+            exibirAlerta('Login efetuado com sucesso! Bem-vindo, ' + dados.nome, 'success');
+            atualizarInterfaceUsuario();
+            carregarLivros();
+            carregarAutores();
+            carregarCategorias();
+        } catch (e) {
+            exibirAlerta('Erro ao conectar ao servidor.', 'error');
+        }
+    }
+
+    function fazerLogout() {
+        tokenAtual = '';
+        usuarioAtual = null;
+        localStorage.removeItem('biblioteca_jwt_token');
+        localStorage.removeItem('biblioteca_jwt_user');
+        atualizarInterfaceUsuario();
+        document.getElementById('tabelaLivros').innerHTML = '<tr><td colspan="7" style="text-align: center; color: #94a3b8;">Faça login para visualizar os livros</td></tr>';
+        exibirAlerta('Sessão encerrada.', 'success');
+    }
+
+    function atualizarInterfaceUsuario() {
+        const statusText = document.getElementById('userStatusText');
+        const btnLogout = document.getElementById('btnLogout');
+        const cardAdmin = document.getElementById('cardAdmin');
+
+        if (tokenAtual && usuarioAtual) {
+            statusText.innerHTML = `<strong>${usuarioAtual.nome}</strong> <span class="badge ${usuarioAtual.perfil === 'ADMIN' ? 'badge-warning' : 'badge-info'}">${usuarioAtual.perfil}</span>`;
+            btnLogout.classList.remove('hidden');
+            if (usuarioAtual.perfil === 'ADMIN') {
+                cardAdmin.classList.remove('hidden');
+            } else {
+                cardAdmin.classList.add('hidden');
+            }
+        } else {
+            statusText.textContent = 'Não autenticado';
+            btnLogout.classList.add('hidden');
+            cardAdmin.classList.add('hidden');
+        }
+    }
+
+    async function carregarLivros() {
+        if (!tokenAtual) {
+            exibirAlerta('É necessário realizar login para carregar os livros.', 'error');
+            return;
+        }
+
+        try {
+            const resp = await fetch('/api/livros', {
+                headers: { 'Authorization': 'Bearer ' + tokenAtual }
+            });
+
+            if (resp.status === 401 || resp.status === 403) {
+                exibirAlerta('Sessão expirada ou não autorizada. Faça login novamente.', 'error');
+                fazerLogout();
+                return;
+            }
+
+            const livros = await resp.json();
+            const tbody = document.getElementById('tabelaLivros');
+            tbody.innerHTML = '';
+
+            if (livros.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum livro cadastrado</td></tr>';
+                return;
+            }
+
+            livros.forEach(livro => {
+                const tr = document.createElement('tr');
+                const badge = livro.disponivel 
+                    ? '<span class="badge badge-success">Disponível</span>' 
+                    : '<span class="badge badge-warning">Emprestado</span>';
+
+                let acoes = '';
+                if (livro.disponivel) {
+                    acoes = `<button class="small" onclick="prepararEmprestimo(${livro.id})">Emprestar</button>`;
+                } else {
+                    acoes = `<span style="font-size: 12px; color: #64748b;">Indisponível</span>`;
+                }
+
+                if (usuarioAtual && usuarioAtual.perfil === 'ADMIN') {
+                    acoes += ` <button class="danger small" onclick="excluirLivro(${livro.id})">Excluir</button>`;
+                }
+
+                tr.innerHTML = `
+                    <td>${livro.id}</td>
+                    <td><strong>${livro.titulo}</strong></td>
+                    <td>${livro.autorNome || '-'}</td>
+                    <td>${livro.categoriaNome || '-'}</td>
+                    <td>${livro.anoPublicacao || '-'}</td>
+                    <td>${badge}</td>
+                    <td>${acoes}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (e) {
+            exibirAlerta('Erro ao carregar lista de livros.', 'error');
+        }
+    }
+
+    async function carregarAutores() {
+        if (!tokenAtual) return;
+        try {
+            const resp = await fetch('/api/autores', {
+                headers: { 'Authorization': 'Bearer ' + tokenAtual }
+            });
+            if (resp.ok) {
+                const autores = await resp.json();
+                const sel = document.getElementById('selectAutor');
+                sel.innerHTML = autores.map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+            }
+        } catch (e) {}
+    }
+
+    async function carregarCategorias() {
+        if (!tokenAtual) return;
+        try {
+            const resp = await fetch('/api/categorias', {
+                headers: { 'Authorization': 'Bearer ' + tokenAtual }
+            });
+            if (resp.ok) {
+                const categorias = await resp.json();
+                const sel = document.getElementById('selectCategoria');
+                sel.innerHTML = categorias.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+            }
+        } catch (e) {}
+    }
+
+    function prepararEmprestimo(livroId) {
+        document.getElementById('empLivroId').value = livroId;
+        if (usuarioAtual) {
+            document.getElementById('empUsuarioId').value = 1;
+        }
+    }
+
+    async function realizarEmprestimo() {
+        if (!tokenAtual) {
+            exibirAlerta('Faça login para realizar um empréstimo.', 'error');
+            return;
+        }
+
+        const livroId = document.getElementById('empLivroId').value;
+        const usuarioId = document.getElementById('empUsuarioId').value;
+        const dataDevolucaoPrevista = document.getElementById('empDataDev').value;
+
+        if (!livroId || !usuarioId || !dataDevolucaoPrevista) {
+            exibirAlerta('Preencha todos os campos do empréstimo.', 'error');
+            return;
+        }
+
+        try {
+            const resp = await fetch('/api/emprestimos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + tokenAtual
+                },
+                body: JSON.stringify({
+                    livroId: parseInt(livroId),
+                    usuarioId: parseInt(usuarioId),
+                    dataDevolucaoPrevista: dataDevolucaoPrevista
+                })
+            });
+
+            if (resp.status === 201) {
+                exibirAlerta('Empréstimo registrado com sucesso!', 'success');
+                carregarLivros();
+            } else {
+                const erro = await resp.json().catch(() => ({}));
+                exibirAlerta(erro.mensagem || 'Falha ao registrar empréstimo.', 'error');
+            }
+        } catch (e) {
+            exibirAlerta('Erro na comunicação com a API.', 'error');
+        }
+    }
+
+    async function cadastrarLivro() {
+        if (!tokenAtual) return;
+
+        const titulo = document.getElementById('novoTitulo').value;
+        const isbn = document.getElementById('novoIsbn').value;
+        const anoPublicacao = document.getElementById('novoAno').value;
+        const autorId = document.getElementById('selectAutor').value;
+        const categoriaId = document.getElementById('selectCategoria').value;
+
+        if (!titulo || !autorId) {
+            exibirAlerta('Título e Autor são obrigatórios.', 'error');
+            return;
+        }
+
+        try {
+            const resp = await fetch('/api/livros', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + tokenAtual
+                },
+                body: JSON.stringify({
+                    titulo,
+                    isbn,
+                    anoPublicacao: anoPublicacao ? parseInt(anoPublicacao) : null,
+                    autorId: parseInt(autorId),
+                    categoriaId: categoriaId ? parseInt(categoriaId) : null
+                })
+            });
+
+            if (resp.status === 201) {
+                exibirAlerta('Livro cadastrado com sucesso!', 'success');
+                document.getElementById('novoTitulo').value = '';
+                document.getElementById('novoIsbn').value = '';
+                document.getElementById('novoAno').value = '';
+                carregarLivros();
+            } else {
+                const erro = await resp.json().catch(() => ({}));
+                exibirAlerta(erro.mensagem || 'Erro ao cadastrar livro.', 'error');
+            }
+        } catch (e) {
+            exibirAlerta('Erro ao conectar com o servidor.', 'error');
+        }
+    }
+
+    async function excluirLivro(id) {
+        if (!tokenAtual) return;
+        if (!confirm('Deseja realmente remover o livro #' + id + '?')) return;
+
+        try {
+            const resp = await fetch('/api/livros/' + id, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + tokenAtual }
+            });
+
+            if (resp.status === 204) {
+                exibirAlerta('Livro removido com sucesso!', 'success');
+                carregarLivros();
+            } else {
+                const erro = await resp.json().catch(() => ({}));
+                exibirAlerta(erro.mensagem || 'Erro ao excluir livro.', 'error');
+            }
+        } catch (e) {
+            exibirAlerta('Erro ao conectar com o servidor.', 'error');
+        }
+    }
+</script>
+</body>
+</html>
